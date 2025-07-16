@@ -14,3 +14,12 @@
              ((Brain<HappyGhast>)this.brain).tick(level, this);
              profilerFiller.pop();
              profilerFiller.push("happyGhastActivityUpdate");
+@@ -543,7 +_,7 @@
+             boundingBox.maxZ + 1.0
+         );
+ 
+-        for (Player player : this.level().players()) {
++        for (Player player : this.level().getLocalPlayers()) { // Canvas - region threading - use local players
+             if (!player.isSpectator()) {
+                 Entity rootVehicle = player.getRootVehicle();
+                 if (!(rootVehicle instanceof HappyGhast) && aabb.contains(rootVehicle.position())) {
