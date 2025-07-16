@@ -1,0 +1,90 @@
+From 7aa1b27cbdf48f4b482d2032e4905c3f9fa7b124 Mon Sep 17 00:00:00 2001
+From: GitHub Actions <actions@github.com>
+Date: Tue, 15 Jul 2025 19:35:48 +0700
+Subject: [PATCH] [PATCH] Canvas teleport event patch
+
+diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
+index f838bcb..e9dde25 100644
+--- a/net/minecraft/world/entity/Entity.java
++++ b/net/minecraft/world/entity/Entity.java
+@@ -320,7 +320,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+     protected UUID uuid = Mth.createInsecureUUID(this.random);
+     protected String stringUUID = this.uuid.toString();
+     private boolean hasGlowingTag;
+-    private final Set<String> tags = new io.papermc.paper.util.SizeLimitedSet<>(new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>(), MAX_ENTITY_TAG_COUNT); // Paper - fully limit tag size - replace set impl
++    private final Set<String> tags = new io.papermc.paper.util.SizeLimitedSet<>(it.unimi.dsi.fastutil.objects.ObjectSets.synchronize(new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>()), MAX_ENTITY_TAG_COUNT); // Paper - fully limit tag size - replace set impl // Canvas - fix commands with region threading
+     private final double[] pistonDeltas = new double[]{0.0, 0.0, 0.0};
+     private long pistonDeltasGameTime = Long.MIN_VALUE; // Folia - region threading
+     private EntityDimensions dimensions;
+@@ -4370,12 +4370,50 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+                 return false;
+             }
+         }
++        if (destination.isUnloading) return false; // Canvas - fix world loading/unloading
+ 
+         // TODO any events that can modify go HERE
++        // Canvas start - fix events with region threading
++        // Note: TeleportCommand.java normally calls this event for that, but we
++        // don't need to there because it calls this method, and we handle it here
++        Vec3 currPos = this.position();
++        org.bukkit.Location newLocation;
++        org.bukkit.Location from = new org.bukkit.Location(this.level().getWorld(), currPos.x, currPos.y, currPos.z, this.getYRot(), this.getXRot());
++        org.bukkit.Location to = new org.bukkit.Location(destination.getWorld(), pos.x, pos.y, pos.z, from.getYaw(), from.getPitch());
++        if (!(this instanceof ServerPlayer player)) {
++            org.bukkit.event.entity.EntityTeleportEvent entityTeleportEvent = new org.bukkit.event.entity.EntityTeleportEvent(
++                this.getBukkitEntity(), from, to
++            );
++            if (!entityTeleportEvent.callEvent() || entityTeleportEvent.getTo() == null) {
++                return false;
++            } else {
++                newLocation = entityTeleportEvent.getTo();
++                yaw = entityTeleportEvent.getTo().getYaw();
++                pitch = entityTeleportEvent.getTo().getPitch();
++            }
++        } else {
++            org.bukkit.event.player.PlayerTeleportEvent playerTeleportEvent = new org.bukkit.event.player.PlayerTeleportEvent(
++                player.getBukkitEntity(), from, to,
++                cause, Set.of()
++            );
++
++            if (!playerTeleportEvent.callEvent()) {
++                return false;
++            } else {
++                newLocation = playerTeleportEvent.getTo();
++                yaw = playerTeleportEvent.getTo().getYaw();
++                pitch = playerTeleportEvent.getTo().getPitch();
++            }
++        }
++
++        pos = new Vec3(
++            newLocation.getX(), newLocation.getY(), newLocation.getZ()
++        );
++        // Canvas end
+ 
+         // check for same region
+         if (destination == this.level()) {
+-            Vec3 currPos = this.position();
++            // Vec3 currPos = this.position(); // Canvas - fix events with region threading - move up
+             // Luminol - Prevent entity sync teleported to the edge of tickregion
+             if (this.checkNearbyTickRegions((int) pos.x, (int) pos.z) && // Luminol - Fix sync teleport issue
+                 destination.regioniser.getRegionAtUnsynchronised(
+@@ -4723,6 +4723,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+                 }
+             }
+         }
++        if (to != null && to.isUnloading) return false; // Canvas - fix world loading/unloading
+ 
+         return true;
+     }
+diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
+index 79c115f..1976546 100644
+--- a/net/minecraft/server/level/ServerLevel.java
++++ b/net/minecraft/server/level/ServerLevel.java
+@@ -657,6 +657,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+     public static final int WORLD_INIT_CHECKED = 2;
+     public final java.util.concurrent.atomic.AtomicInteger checkInitialised = new java.util.concurrent.atomic.AtomicInteger(WORLD_INIT_NOT_CHECKED);
+     public ChunkPos randomSpawnSelection;
++    public volatile boolean isUnloading = false; // Canvas - fix world loading/unloading
+ 
+     public static final record PendingTeleport(Entity.EntityTreeNode rootVehicle, Vec3 to) {}
+     private final it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<PendingTeleport> pendingTeleports = new it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<>();
