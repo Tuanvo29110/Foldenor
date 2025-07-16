@@ -5,7 +5,7 @@
      private static final String ATTRIBUTE_GIT_COMMIT = "Git-Commit";
  
 -    private static final String BRAND_PAPER_NAME = "Paper";
-+    private static final String BRAND_PAPER_NAME = "Sigma";
++    private static final String BRAND_PAPER_NAME = "Foldenor";
 +    private static final Key BRAND_FOLIA_ID = Key.key("papermc", "folia");
  
      private static final String BUILD_DEV = "DEV";
@@ -18,7 +18,7 @@
 +                .orElse(Key.key("edenor", "foldenor")), // Foldenor
              getManifestAttribute(manifest, ATTRIBUTE_BRAND_NAME)
 -                .orElse("Folia"), // Folia
-+                .orElse("Sigma"), // Foldenor
++                .orElse("Foldenor"), // Foldenor
              SharedConstants.getCurrentVersion().id(),
              SharedConstants.getCurrentVersion().name(),
              getManifestAttribute(manifest, ATTRIBUTE_BUILD_NUMBER)
