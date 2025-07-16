@@ -13,7 +13,7 @@ index 15696729bcdde7526098328348ba6d566706149b..41d7f41c916c596e5c48352ecb62b680
      @DontObfuscate
      public String getServerModName() {
 -        return io.papermc.paper.ServerBuildInfo.buildInfo().brandName(); // Paper
-+        return "Sigma" // Paper
++        return "Sigma"; // Paper
      }
  
      public SystemReport fillSystemReport(SystemReport systemReport) {
