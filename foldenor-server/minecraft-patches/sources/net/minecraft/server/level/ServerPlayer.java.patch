@@ -9,15 +9,6 @@
      private final PlayerAdvancements advancements;
      private final ServerStatsCounter stats;
      private float lastRecordedHealthAndAbsorption = Float.MIN_VALUE;
-@@ -265,7 +_,7 @@
-     private BlockPos raidOmenPosition;
-     private Vec3 lastKnownClientMovement = Vec3.ZERO;
-     private Input lastClientInput = Input.EMPTY;
--    private final Set<ThrownEnderpearl> enderPearls = new HashSet<>();
-+    private final Set<ThrownEnderpearl> enderPearls = java.util.concurrent.ConcurrentHashMap.newKeySet();
-     public final ContainerSynchronizer containerSynchronizer = new ContainerSynchronizer() {
-         private final LoadingCache<TypedDataComponent<?>, Integer> cache = CacheBuilder.newBuilder()
-             .maximumSize(256L)     
 @@ -434,6 +_,8 @@
      private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
      private final ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.ViewDistanceHolder viewDistanceHolder = new ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.ViewDistanceHolder();
