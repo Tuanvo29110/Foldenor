@@ -69,7 +69,7 @@
          // special cases.
          if (entity instanceof final LivingEntity living) {
 -            if (living.onClimbable() || living.jumping || living.hurtTime > 0 || !living.activeEffects.isEmpty() || living.isFreezing()) {
-+            if ( living.onClimableCached() || living.jumping || living.hurtTime > 0 || living.activeEffects.size() > 0) {// Paper
++            if (living.onClimableCached() || living.onClimbable() || living.jumping || living.hurtTime > 0 || !living.activeEffects.isEmpty() || living.isFreezing()) { // Pufferfish - use cached
                  return 1;
              }
              if (entity instanceof final Mob mob && mob.getTarget() != null) {
