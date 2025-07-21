@@ -49,4 +49,4 @@
 +        // Canvas end - fix folia issues
      }
  
-     protected void followThePath() {         
+     protected void followThePath() {
