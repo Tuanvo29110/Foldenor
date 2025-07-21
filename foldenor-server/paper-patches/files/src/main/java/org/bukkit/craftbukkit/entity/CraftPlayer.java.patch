@@ -9,7 +9,7 @@
      private final Set<UUID> unlistedEntities = new HashSet<>(); // Paper - Add Listing API for Player
      public org.bukkit.event.player.PlayerResourcePackStatusEvent.Status resourcePackStatus; // Paper - more resource pack API
      private long firstPlayed = 0;
-@@ -2341,9 +2341,16 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
+@@ -2341,9 +_,16 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
  
      @Override
      public boolean canSee(org.bukkit.entity.Entity entity) {
