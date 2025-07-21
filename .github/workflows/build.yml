@@ -39,6 +39,12 @@ jobs:
    
       - name: Build MojmapPaperclip
         run: ./gradlew createMojmapPaperclipJar
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Foldenor 1.21.7
+          path: "*"
            
       - name: Make release
         uses: marvinpinto/action-automatic-releases@master
