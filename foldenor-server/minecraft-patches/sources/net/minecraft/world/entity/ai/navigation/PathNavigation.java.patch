@@ -17,14 +17,6 @@
          if (this.tick - this.timeLastRecompute > 20L) { // Folia - region threading
              if (this.targetPos != null) {
                  this.path = null;
-@@ -458,6 +_,7 @@
-     }
- 
-     public boolean shouldRecomputePath(BlockPos pos) {
-+        if (!FoldenorConfig.mobRePathFinding) return false;
-         if (this.hasDelayedRecomputation) {
-             return false;
-         } else if (this.path != null && !this.path.isDone() && this.path.getNodeCount() != 0) {
 @@ -155,7 +_,7 @@
  
      @Nullable
@@ -49,4 +41,12 @@
 +        // Canvas end - fix folia issues
      }
  
-     protected void followThePath() {
+     protected void followThePath() {     
+@@ -458,6 +_,7 @@
+     }
+ 
+     public boolean shouldRecomputePath(BlockPos pos) {
++        if (!FoldenorConfig.mobRePathFinding) return false;
+         if (this.hasDelayedRecomputation) {
+             return false;
+         } else if (this.path != null && !this.path.isDone() && this.path.getNodeCount() != 0) {
