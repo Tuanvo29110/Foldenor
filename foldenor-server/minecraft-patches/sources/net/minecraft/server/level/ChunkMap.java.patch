@@ -1,0 +1,29 @@
+--- a/net/minecraft/server/level/ChunkMap.java
++++ b/net/minecraft/server/level/ChunkMap.java
+@@ -1245,8 +_,14 @@
+         }
+ 
+         public void broadcast(Packet<?> packet) {
+-            for (ServerPlayerConnection serverPlayerConnection : this.seenBy) {
+-                serverPlayerConnection.send(packet);
++            if (this.seenBy.isEmpty()) {
++                return;
++            }
++
++            for (ServerPlayerConnection serverPlayerConnection : new ArrayList<>(this.seenBy)) {
++                if (serverPlayerConnection != null) {
++                    serverPlayerConnection.send(packet);
++                }
+             }
+         }
+ 
+@@ -1273,6 +_,9 @@
+ 
+         public void removePlayer(ServerPlayer player) {
+             org.spigotmc.AsyncCatcher.catchOp("player tracker clear"); // Spigot
++            if (!this.seenBy.contains(player.connection)) {
++                return;
++            }
+             if (this.seenBy.remove(player.connection)) {
+                 this.serverEntity.removePairing(player);
+             }
