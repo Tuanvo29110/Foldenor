@@ -30,3 +30,12 @@
      }
  
      public boolean hasAttribute(Holder<Attribute> attribute) {
+@@ -39,7 +_,7 @@
+     }
+ 
+     public Collection<AttributeInstance> getSyncableAttributes() {
+-        return this.attributes.values().stream().filter(instance -> instance.getAttribute().value().isClientSyncable()).collect(Collectors.toList());
++        return this.attributes.values().stream().filter(instance -> instance != null && instance.getAttribute().value().isClientSyncable()).collect(Collectors.toList()); // Canvas - ensure non-null
+     }
+ 
+     @Nullable
